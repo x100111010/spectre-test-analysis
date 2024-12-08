@@ -2,6 +2,8 @@ from collections import defaultdict
 import glob
 import json
 import statistics
+from datetime import datetime, timezone
+
 
 # Constants
 SPENT_OUTPUTS = True
@@ -40,10 +42,47 @@ fees = []
 sending_addrs = set()
 receiving_addrs = set()
 
+blocks_per_day = defaultdict(
+    lambda: {"total": 0, "chainblocks": 0, "non_chainblocks": 0, "blues": 0, "reds": 0}
+)
+
 # Pre-process data
 for hash, block in blocks.items():
-    blocks_per_daa[block["header"]["daaScore"]] += 1
     block_timestamps.append(int(block["header"]["timestamp"]))
+
+if block_timestamps:
+    earliest_time = min(block_timestamps)
+    latest_time = max(block_timestamps)
+else:
+    print("No timestamps found in blocks!")
+    exit(1)
+
+
+def start_of_day(ts):
+    return ts - (ts % (24 * 60 * 60 * 1000))
+
+
+for hash, block in blocks.items():
+    timestamp = int(block["header"]["timestamp"])
+    day_start = start_of_day(timestamp)
+
+    blocks_per_day[day_start]["total"] += 1
+
+    if block["verboseData"].get("isChainBlock"):
+        blocks_per_day[day_start]["chainblocks"] += 1
+    else:
+        blocks_per_day[day_start]["non_chainblocks"] += 1
+
+    # Directly count merged blues and reds for blocks within this time range
+    blocks_per_day[day_start]["blues"] += len(
+        block["verboseData"].get("mergeSetBluesHashes", [])
+    )
+    blocks_per_day[day_start]["reds"] += len(
+        block["verboseData"].get("mergeSetRedsHashes", [])
+    )
+
+for hash, block in blocks.items():
+    blocks_per_daa[block["header"]["daaScore"]] += 1
 
     # Chainblock vs. non-chainblock
     if block["verboseData"].get("isChainBlock"):
@@ -144,6 +183,19 @@ print(f"Chainblocks: {len(chainblocks):,}")
 print(f"Non-chainblocks: {len(non_chainblocks):,}")
 print(f"Merged blues: {len(merged_blues):,}")
 print(f"Merged reds: {len(merged_reds):,}\n")
+
+print("--- Daily BLOCK Analysis ---")
+for day_start, counts in sorted(blocks_per_day.items()):
+    day_str = datetime.fromtimestamp(day_start // 1000, tz=timezone.utc).strftime(
+        "%Y-%m-%d"
+    )
+    print(f"Date: {day_str}")
+    print(f"Total blocks: {counts['total']}")
+    print(f"Chainblocks: {counts['chainblocks']}")
+    print(f"Non-chainblocks: {counts['non_chainblocks']}")
+    print(f"Merged blues: {counts['blues']}")
+    print(f"Merged reds: {counts['reds']}")
+    print()
 
 print(f"Coinbase transactions: {coinbase_txs:,}")
 print(f"Coinbase outputs: {len(coinbase_outputs):,}\n")
