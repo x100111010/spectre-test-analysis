@@ -10,6 +10,7 @@ from spectred.SpectredClient import SpectredClient
 
 ## Helpers
 async def get_blocks(rpc_client, low_hash):
+    print(f"Requesting blocks with lowHash: {low_hash}")
     r = await rpc_client.request(
         "getBlocksRequest",
         params={
@@ -136,7 +137,7 @@ async def main():
                         tx["acceptingBlockHash"] = d["acceptingBlockHash"]
 
     # Dump to JSON
-    with open("./data/block2.json", "w") as f:
+    with open("./data/block.json", "w") as f:
         json.dump({"blocks": block_cache}, f, indent=4)
 
 

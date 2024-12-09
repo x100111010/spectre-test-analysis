@@ -19,29 +19,29 @@ info_labels = [entry["info"] for entry in info_analysis]
 info_counts = [entry["count"] for entry in info_analysis]
 
 # pie chart for address distribution
-plt.figure(figsize=(10, 8))
+plt.figure(figsize=(14, 8))
 plt.pie(
     address_counts,
     labels=address_labels,
     autopct="%1.1f%%",
     startangle=140,
-    textprops={"fontsize": 8},
+    textprops={"fontsize": 6},
 )
-plt.title("Mining Address Distribution")
-plt.savefig("mining_address_distribution.png")
+plt.title("Mining Address Distribution from Last Pruning Point to Tip")
+plt.savefig("data/mining_address_distribution.png")
 plt.close()
 
 # pie chart for info distribution
-plt.figure(figsize=(10, 8))
+plt.figure(figsize=(14, 8))
 plt.pie(
     info_counts,
     labels=info_labels,
     autopct="%1.1f%%",
     startangle=140,
-    textprops={"fontsize": 8},
+    textprops={"fontsize": 6},
 )
-plt.title("Mining Software/Info Distribution")
-plt.savefig("mining_software_distribution.png")
+plt.title("Mining Info Distribution from Last Pruning Point to Tip")
+plt.savefig("data/mining_info_payload_distribution.png")
 plt.close()
 
 print("Pie charts have been successfully generated and saved.")
