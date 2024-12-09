@@ -158,10 +158,13 @@ for hash, block in blocks.items():
 
 # Define utility for printing statistics
 def list_stats(title, data_list, ptotal=True, to_spr=True):
-    data_list.sort()
+    if not data_list:  # Check if the list is empty
+        print(f"{title}\nNo data available.")
+        return
 
+    data_list.sort()
     total = sum(data_list)
-    mean = sum(data_list) / len(data_list)
+    mean = total / len(data_list)
     median = statistics.median(data_list)
     minimum = min(data_list)
     maximum = max(data_list)
