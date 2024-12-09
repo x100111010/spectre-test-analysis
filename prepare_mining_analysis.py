@@ -5,6 +5,8 @@ from helper.mining_address import retrieve_miner_info_from_payload
 blocks_file = r"data\block.json"
 output_file = r"data\mining_analysis.json"
 
+# prepares data from blocks.json
+
 mining_data = []
 
 # Load the blocks.json file
