@@ -1,6 +1,6 @@
 import json
 import matplotlib.pyplot as plt
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Input file path
 mining_analysis_file = r"data\mining_analysis.json"
@@ -14,8 +14,8 @@ hashrates = []
 
 for entry in mining_data:
     try:
-        timestamp = int(entry["timestamp"]) / 1000
-        readable_time = datetime.utcfromtimestamp(timestamp)
+        timestamp = int(entry["blocktime"]) / 1000
+        readable_time = datetime.fromtimestamp(timestamp, timezone.utc)
 
         # hashrate in MH/s
         difficulty = entry.get("difficulty", 0)
@@ -28,7 +28,7 @@ for entry in mining_data:
         print(f"Error processing entry: {e}")
 
 # Plot the graph
-plt.figure(figsize=(12, 6))
+plt.figure(figsize=(18, 12))
 plt.plot(timestamps, hashrates, label="Hashrate (MH/s)", color="blue")
 
 # Formatting
@@ -40,7 +40,7 @@ plt.grid(True)
 plt.legend()
 
 # Save graph
-output_image = "hashrate_over_time.png"
+output_image = "data/hashrate_over_time.png"
 plt.tight_layout()
 plt.savefig(output_image)
 plt.close()
